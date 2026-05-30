@@ -1,2 +1,2 @@
 # LockedIn
-LinkedIn Open Source Replacement
+LinkedIn's AI-powered Free Open Source Replacement
