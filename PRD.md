@@ -50,124 +50,107 @@ lockedin helps professionals build their public career identity, discover opport
 
 ### 6.1 Authentication
 
-- Email/password login
-- OAuth login later
-- User session management
+- Local Email/password signup and login
+- Local session validation and security
+- Cryptographic key generation per user profile (used for signing federated activities)
 
-### 6.2 Profile
+### 6.2 Profile & Portability
 
-- Name
-- Headline
-- Bio
-- Skills
-- Experience
-- Education
-- Projects
-- Links
-- Open-source contributions
-- AI-generated profile improvement suggestions
+- Name, Headline, Bio, Skills, Experience, Education, Projects, and Links
+- GitHub/open-source contribution integration
+- **Frictionless Onboarding**: Direct parser/importer for JSON Resume files and LinkedIn data archive exports (e.g., parsing profile details, experiences, and education automatically)
+- AI-generated profile suggestions based on imported resume data
 
-### 6.3 Feed
+### 6.3 Cryptographic Trust & Verification
 
-- Create text posts
-- Like posts
-- Comment on posts
-- Follow users
-- Basic ranking by recency and engagement
+- **Domain-Based Verification**: DNS TXT or institutional email validation (e.g., verification of employment at `company.com` or enrollment at `university.edu` via challenge-response mail matching the domain)
+- Cryptographic verification badges displayed on public profiles (indicating verified emails/domains)
 
-### 6.4 AI Assistant
+### 6.4 Feed & User-Controlled Algorithms
 
-- Improve profile headline
-- Rewrite bio
-- Generate post ideas
-- Improve post tone
-- Suggest skills based on user profile
-- Generate project descriptions
+- Create text and link posts
+- Like and comment on posts
+- Follow local and remote users (data schema supports federated paths)
+- **Transparent Feed Controls**: Feed configuration sliders in UI allowing users to set weights (e.g., Recency % vs. Verified Professional % vs. Specific Skill Matching %)
+- Chronological raw fallback feed option
 
-### 6.5 Search and Discovery
+### 6.5 AI Assistant & Parsing
 
-- Search users
-- Search posts
-- Filter by skill, role, location, and interests
+- Auto-extract and map skills from imported LinkedIn archives
+- Rewrite profile bio and improve headline
+- Generate post ideas and refine draft tone
+- System-wide prompt logs with safety/injection filters
 
-### 6.6 Opportunities
+### 6.6 Federation Readiness (MVP Foundation)
 
-- Open-source projects looking for contributors
-- Internship/job posts
-- Collaboration requests
+- ActivityPub actor database schema (distinguishing local users from federated actor links)
+- Structured API endpoints for ActivityPub Actor, Inbox, and Outbox (MVP focuses on schema readiness, local interactions, and federated modeling)
+- Webfinger resolution schema draft
 
-### 6.7 Open Source
+### 6.7 Opportunities & Niche Target
 
-- Public GitHub repo
-- Contribution guide
-- Issue templates
-- Project board
-- Local development setup
+- Focus on open-source projects looking for contributors, early tech startups, and academic lab research positions
+- Collaboration requests and job posts containing skill tag requirements
+- Developer-specific trust metrics (e.g., verifying active repository contributions)
 
-## 7. Non-MVP Features
+### 6.8 Open Source & Self-Hosting
 
-- Mobile app
-- Advanced recommendation engine
-- Full recruiter dashboard
-- Paid plans
-- Messaging
-- Company pages
-- Video posts
-- Browser extension
-- Decentralized identity
+- Public GitHub repository with clean issue templates and contribution guidelines
+- Comprehensive local self-hosted docker deployment instructions for individual servers/nodes
+
+## 7. Non-MVP Features (Post-MVP Milestones)
+
+- **Full Peer Syncing & ActivityPub Subscriptions**: Live background synchronization of feeds/follows between separate self-hosted nodes
+- **Decentralized Content Moderation at Scale**: Shared instance-level blocklists, distributed user reporting queues, and administrator moderation panel
+- **W3C Decentralized Identifiers (DIDs)**: Advanced DID registry integration for passwordless cross-instance authentication
+- **Enterprise ATS Integration APIs**: Premium paid APIs for corporate Applicant Tracking Systems (monetization/sustainability model)
+- Mobile applications (React Native / Flutter)
+- Company and team page workspaces
 
 ## 8. Success Metrics
 
 ### Product Metrics
 
-- Weekly active users
-- Profiles completed
-- Posts created
-- Connections/follows created
-- AI actions used
-- Search usage
-- Opportunity applications/collaboration requests
+- Weekly active users across instances
+- Profiles completed (via LinkedIn import vs. manual)
+- DNS/Email domains successfully verified (measure of trust density)
+- User adjustments to feed sliders (active algorithm customization)
+- Connections/follows established between nodes
+- Opportunity applications/collaboration requests completed
 
 ### Open Source Metrics
 
-- GitHub stars
-- Forks
-- Contributors
-- Issues closed
-- Pull requests merged
-- Community discussions
+- GitHub stars and forks
+- Number of independent self-hosted instances running
+- Contributors and pull requests merged
+- Community discussions around algorithm transparency
 
 ## 9. User Stories
 
-### Profile
+### Profile & Portability
 
-As a user, I want to create a professional profile so that others can understand my skills, work, and goals.
+- **Onboarding**: As a new user, I want to upload my LinkedIn data archive or JSON Resume so that I do not have to manually retype my entire career history.
+- **Verification**: As a recruiter or collaborator, I want to see a cryptographic verification badge on a user's profile indicating they verified ownership of their work email (e.g., `engineer@google.com`) so that I can trust their career claims.
 
-### AI Profile Assistant
+### Feed & Algorithm
 
-As a user, I want AI to improve my headline and bio so that my profile looks more professional.
+- **Custom Feeds**: As a user, I want to adjust sliders in my feed (e.g., turn down thought leadership and increase skill matches) so that I have absolute, transparent control over what I see.
+- **Posting**: As a user, I want to post my open-source project updates so that my followers across my local instance and peer nodes can see it.
 
-### Feed
+### Discovery & Opportunities
 
-As a user, I want to share posts so that I can build visibility.
-
-### Discovery
-
-As a user, I want to find people by skill or role so that I can connect with relevant professionals.
-
-### Opportunities
-
-As a user, I want to discover internships, jobs, and open-source projects so that I can grow my career.
+- **Niche Search**: As an open-source maintainer, I want to filter professionals by verified domain and specific skill tags so that I can recruit credible collaborators for my project.
 
 ## 10. MVP Release Criteria
 
 The MVP is ready when:
 
-- Users can sign up and log in
-- Users can create and edit profiles
-- Users can create posts
-- Users can follow users
-- Users can search profiles
-- AI profile/post assistant works
-- Project can run locally with documentation
-- Basic tests and CI are available
+- Users can sign up, log in, and generate cryptographic signing keys
+- Users can import career data from a JSON Resume or LinkedIn archive file
+- Domain-based email verification (challenge-response) successfully assigns verification badges
+- Users can customize feed sorting via ranking weight sliders in the interface
+- Users can post updates, follow local accounts, and interact with the feed
+- The database schema is fully ActivityPub-compatible (local vs. remote actors)
+- Developers can launch and configure a local self-hosted instance using Docker compose
+- Unit tests cover the resume parser, feed weighting engines, and verification email routers
+

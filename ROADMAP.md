@@ -22,111 +22,85 @@ Deliverables:
 - Roadmap
 - Contribution guide
 
-## Phase 1: MVP Foundation
+## Phase 1: MVP Foundation & Cryptography
 
 Timeline: Week 1 to Week 3
 
 Goals:
-
-- Set up frontend
-- Set up backend
-- Set up database
-- Set up auth
-- Set up CI/CD
+- Set up core Next.js, Postgres database (Prisma), and Tailwind UI stack
+- Build local authentication and session validation
+- Generate and store user-profile cryptographic RSA public/private keypairs
 
 Deliverables:
+- Working local server with auth and database schema
+- Secure encrypted private key storage utility
+- Basic routing framework
 
-- Working local app
-- User registration
-- Login/logout
-- Database schema
-- Protected routes
+## Phase 2: Ingestion & Onboarding Portability
 
-## Phase 2: Profile and Feed
-
-Timeline: Week 3 to Week 6
+Timeline: Week 3 to Week 5
 
 Goals:
-
-- Build profile system
-- Build public profile pages
-- Build posting system
-- Build feed
+- Design Profile database schema (supporting local and remote configurations)
+- Implement JSON Resume parser and LinkedIn zip archive ingestion services
+- Integrate AI-driven auto-extraction for skills and experience mapping
 
 Deliverables:
+- Resume/Archive drag-and-drop file uploader UI
+- Profile data hydration from uploaded resume archives
+- Public profile page rendering parsed history
 
-- Create/edit profile
-- Public profile
-- Create post
-- Feed
-- Follow users
+## Phase 3: Feed & Curation Sliders
 
-## Phase 3: AI-Native Features
-
-Timeline: Week 6 to Week 8
+Timeline: Week 5 to Week 7
 
 Goals:
-
-- Add AI profile assistant
-- Add AI post assistant
-- Add project description assistant
-- Add prompt templates
+- Build posting API (local posts tagged with global URI identifiers)
+- Create User Feed interface with customizable ranking sliders
+- Implement backend dynamic weighted scoring engine based on feed preferences
 
 Deliverables:
+- Post creation card with simple editor
+- Dynamic Feed UI displaying posts curated by slider parameter weights
+- User feed preference settings storage
 
-- AI headline improvement
-- AI bio improvement
-- AI post rewrite
-- AI project summary generator
+## Phase 4: Trust Verification & Federation Base
 
-## Phase 4: Search and Opportunities
-
-Timeline: Week 8 to Week 10
+Timeline: Week 7 to Week 9
 
 Goals:
-
-- Add user search
-- Add post search
-- Add skill filters
-- Add opportunity posts
+- Build DNS TXT record crawler to verify company/school domain associations
+- Set up challenge-response SMTP verification codes for institutional domains
+- Create public Webfinger and ActivityPub Actor route templates
 
 Deliverables:
+- Domain verification wizard in profile settings
+- Cryptographic verification badge indicator on profiles
+- Webfinger resolution endpoints (`/.well-known/webfinger`) and public Actor JSON payloads
 
-- Search page
-- Skill-based discovery
-- Opportunity listing
-- Collaboration request format
+## Phase 5: Niche Beta Launch (OS Developers)
 
-## Phase 5: Public Beta
-
-Timeline: Week 10 to Week 12
+Timeline: Week 9 to Week 12
 
 Goals:
-
-- Polish UX
-- Fix bugs
-- Improve docs
-- Launch publicly
-- Invite early users
+- Restrict launch target to open-source developers, university tech hubs, and early startup teams
+- Implement GitHub/GitLab verification and repository contribution stats display
+- Create comprehensive documentation on self-hosting a local `lockedin` node via Docker Compose
+- Acquire first 100 verified professional profiles on the seed node
 
 Deliverables:
+- Public beta node deployment
+- Comprehensive self-hosting and federation configuration guides
+- Developer dashboard with GitHub stats integration
+- Community feedback forum
 
-- Public deployment
-- GitHub launch
-- Contributor guide
-- Feedback form
-- First 100 users target
-
-## Phase 6: Post-MVP
+## Phase 6: Post-MVP (Federation & Sustainability)
 
 Potential features:
+- **Full Peer Synchronization**: Enable live syncing of posts, follows, and interactions across remote ActivityPub instances
+- **Decentralized Moderation**: Shared domain-blocking records, report queues, and local moderator dashboards
+- **W3C DIDs Integration**: Cross-instance login authentication using W3C Decentralized Identifiers
+- **Enterprise Recruiter ATS APIs**: Paid access endpoints for syncing verified candidate profiles to corporate ATS pipelines (monetization/sustainability model)
+- Collaborative workspaces and team pages
+- End-to-end encrypted direct messaging
 
-- Messaging
-- Company/team pages
-- Recruiter tools
-- Advanced AI recommendations
-- Semantic search
-- Open-source contributor graph
-- Reputation system
-- Mobile app
-- Browser extension

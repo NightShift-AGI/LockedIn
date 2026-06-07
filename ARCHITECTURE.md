@@ -2,224 +2,214 @@
 
 ## 1. High-Level Architecture
 
-lockedin will use a modern web architecture:
-
-- Web frontend
-- Backend API
-- PostgreSQL database
-- AI service layer
-- Search layer
-- Background jobs later
-- Object storage later
-
-## 2. Recommended MVP Architecture
+lockedin is built as a federated professional network where independent instances (nodes) can host their own communities while communicating seamlessly via the **ActivityPub** protocol.
 
 ```text
-User
-  |
-  v
-Next.js Web App
-  |
-  |-- Auth
-  |-- Profile UI
-  |-- Feed UI
-  |-- Search UI
-  |-- AI Assistant UI
-  |
-  v
-API Layer
-  |
-  |-- User Service
-  |-- Profile Service
-  |-- Post Service
-  |-- Follow Service
-  |-- Search Service
-  |-- AI Service
-  |
-  v
-PostgreSQL + Prisma
+               [ Peer lockedin Instance ]
+                           ^
+                           | (ActivityPub via Webfinger & Inbox/Outbox)
+                           v
+   User -> [ Next.js Web App / API ]
+             |
+             +---> [ Ingestion Service ] (LinkedIn/JSON Resume imports)
+             +---> [ Verification Service ] (Domain DNS / SMTP check)
+             +---> [ Feed Weight Engine ] (Slider-weighted ranking calculations)
+             +---> [ AI Service Abstraction ] (Local/OpenAI models)
+             +---> [ ActivityPub Engine ] (Inbox/Outbox routing & HTTP signatures)
+             |
+             v
+        [ PostgreSQL + Prisma ]
 ```
 
-## 3. Core Modules
+---
 
-### 3.1 Auth Module
+## 2. Core Modules
 
-Responsibilities:
+### 2.1 Auth & Key Management Module
+- **Responsibilities**: Local user signup, login, session validation, and JWT management.
+- **Federation requirement**: Upon registration, generates a unique RSA-256 key pair for the user. The public key is published on the user's actor profile, and the private key is encrypted and stored in the database, used to sign outbound federated messages (HTTP Signatures).
 
-- Register
-- Login
-- Logout
-- Session validation
-- Protected routes
+### 2.2 User/Profile & Verification Module
+- **Responsibilities**: Manages local profiles and parses/indexes profiles from other instances.
+- **Verification Engine**: Executes email/domain checks. Generates a DNS TXT verification token (e.g., `lockedin-challenge=xxxx`) or sends a confirmation code to a work email address (e.g., `user@company.com`). Once verified, records a trusted verification entry and displays a cryptographic verification badge.
 
-### 3.2 User/Profile Module
+### 2.3 Portability & Ingestion Module
+- **Responsibilities**: Handles user onboarding migrations.
+- **Ingestion Engine**: Parses a JSON Resume file or LinkedIn archive export (zip file containing CSV/JSON profiles, experiences, education, and skills) and maps it to the Prisma profile schema. Instructs the AI module to auto-tag and match skills from the imported data.
 
-Responsibilities:
+### 2.4 Feed & Weight Engine
+- **Responsibilities**: Computes custom feeds dynamically.
+- **Dynamic Weighting**: Calculates feed ranks on query requests using client-specified slider parameters:
+  $$\text{Post Score} = (w_{\text{recency}} \times \text{RecencyScore}) + (w_{\text{verified}} \times \text{VerificationScore}) + (w_{\text{skills}} \times \text{SkillMatchScore})$$
+  This gives users absolute control over algorithmic curation directly from the UI.
 
-- Store user identity
-- Store public profile
-- Store skills
-- Store experience
-- Store projects
-- Store education
+### 2.5 ActivityPub Federation Module
+- **Responsibilities**: Handles cross-instance follow/post synchronization.
+- **Endpoints**:
+  - `/.well-known/webfinger`: Resolves user queries (e.g., `bob@instance.org`) to actor profile URIs.
+  - `/users/[username]`: Serves the ActivityPub Actor JSON profile.
+  - `/users/[username]/inbox`: Receives signed incoming activities (Create, Follow, Accept, Undo).
+  - `/users/[username]/outbox`: Publishes activities representing local user actions.
 
-### 3.3 Feed Module
+### 2.6 AI Module
+- **Responsibilities**: Interface for text improvements (headlines, bios, posts).
+- **Rule**: All AI models must be accessed through an abstraction interface to support swapping between OpenAI, local Ollama endpoints, or private Hugging Face instances.
 
-Responsibilities:
+### 2.7 Search Module
+- **Responsibilities**: Local database search and discovery. Supports skill filtering, role search, and vector similarity mapping.
 
-- Create posts
-- List feed
-- Like posts
-- Comment on posts
-- Follow-based ranking later
+---
 
-### 3.4 AI Module
+## 3. Data Model Draft (Prisma Schema Reference)
 
-Responsibilities:
+```prisma
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  username     String    @unique
+  publicKey    String    // For ActivityPub HTTP Signatures
+  privateKey   String    // Encrypted RSA private key
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  profile      Profile?
+  posts        Post[]
+  comments     Comment[]
+  likes        Like[]
+}
 
-- Rewrite profile bio
-- Improve headline
-- Generate post ideas
-- Improve post clarity
-- Suggest skills
-- Generate project descriptions
+model Instance {
+  id          String    @id @default(uuid())
+  domain      String    @unique // e.g. "lockedin.university.edu"
+  sharedInbox String
+  status      String    // "ACTIVE", "BLOCKED"
+  createdAt   DateTime  @default(now())
+  profiles    Profile[]
+}
 
-Important design rule:
+model Profile {
+  id             String         @id @default(uuid())
+  userId         String?        @unique
+  user           User?          @relation(fields: [userId], references: [id])
+  instanceId     String?        // Null for local users
+  instance       Instance?      @relation(fields: [instanceId], references: [id])
+  apActorUri     String?        @unique // URI for remote actors
+  headline       String?
+  bio            String?
+  location       String?
+  website        String?
+  githubUrl      String?
+  jsonResumeData Json?          // Store raw imported data
+  experiences    Experience[]
+  skills         UserSkill[]
+  verifications  Verification[]
+}
 
-All AI providers should be abstracted behind one interface so the project can support OpenAI, open-source models, or local LLMs later.
+model Verification {
+  id          String    @id @default(uuid())
+  profileId   String
+  profile     Profile   @relation(fields: [profileId], references: [id])
+  domain      String    // Verified organization domain (e.g. "google.com")
+  verifiedAt  DateTime  @default(now())
+  method      String    // "DNS_TXT" or "EMAIL_CONFIRM"
+}
 
-### 3.5 Search Module
+model Skill {
+  id        String      @id @default(uuid())
+  name      String      @unique
+  profiles  UserSkill[]
+}
 
-MVP:
+model UserSkill {
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id])
+  skillId   String
+  skill     Skill   @relation(fields: [skillId], references: [id])
+  @@id([profileId, skillId])
+}
 
-- PostgreSQL full-text search
+model Experience {
+  id          String    @id @default(uuid())
+  profileId   String
+  profile     Profile   @relation(fields: [profileId], references: [id])
+  company     String
+  role        String
+  startDate   DateTime
+  endDate     DateTime?
+  description String?
+}
 
-Later:
+model Post {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  apId      String    @unique // ActivityPub unique URI for the post
+  content   String
+  local     Boolean   @default(true) // False if fetched from remote instance
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  comments  Comment[]
+  likes     Like[]
+}
 
-- Meilisearch, Typesense, or Elasticsearch
-- Vector search for semantic discovery
+model Follow {
+  id          String   @id @default(uuid())
+  followerUri String   // URI of the follower (supports remote actor URIs)
+  followingUri String  // URI of the followed actor
+  status      String   // "PENDING", "ACCEPTED"
+}
 
-## 4. Data Model Draft
+model Comment {
+  id        String   @id @default(uuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+}
 
-### User
+model Like {
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  postId String
+  post   Post   @relation(fields: [postId], references: [id])
+  @@id([userId, postId])
+}
 
-- id
-- email
-- password_hash
-- name
-- username
-- created_at
-- updated_at
+model FeedPreference {
+  id             String @id @default(uuid())
+  userId         String @unique
+  recencyWeight  Float  @default(0.5)
+  verifiedWeight Float  @default(0.3)
+  skillWeight    Float  @default(0.2)
+}
+```
 
-### Profile
+---
 
-- id
-- user_id
-- headline
-- bio
-- location
-- website
-- github_url
-- linkedin_url
-- portfolio_url
+## 4. Security
 
-### Skill
+- **HTTP Signatures**: Validate signature headers on incoming ActivityPub messages against remote public keys to authenticate nodes.
+- **Content Sanitization**: Remote posts must pass through a strict HTML/Markdown sanitizer before rendering to eliminate XSS injections.
+- **DNS Verification Safeguards**: Verify DNS TXT queries strictly against official name-servers and apply timeouts to prevent server hangs.
 
-- id
-- name
+---
 
-### UserSkill
-
-- user_id
-- skill_id
-
-### Experience
-
-- id
-- user_id
-- company
-- role
-- start_date
-- end_date
-- description
-
-### Project
-
-- id
-- user_id
-- title
-- description
-- url
-- github_url
-- tags
-
-### Post
-
-- id
-- user_id
-- content
-- created_at
-- updated_at
-
-### Follow
-
-- follower_id
-- following_id
-
-### Comment
-
-- id
-- post_id
-- user_id
-- content
-- created_at
-
-### Like
-
-- user_id
-- post_id
-
-### AIRequestLog
-
-- id
-- user_id
-- feature
-- prompt_type
-- input_hash
-- output
-- created_at
-
-## 5. Security
-
-- Hash passwords
-- Validate all inputs
-- Rate-limit AI endpoints
-- Prevent prompt injection where possible
-- Sanitize user-generated content
-- Add moderation for spam later
-- Do not expose API keys to client
-
-## 6. Scalability Plan
+## 5. Scalability & Sustainability Plan
 
 ### MVP
-
-- Monolithic Next.js app
-- PostgreSQL
-- Simple API routes
-- Hosted on Vercel/Render/Fly.io
+- Single-instance Next.js monolithic deployment.
+- Local SQLite or Postgres database.
+- Synchronous ActivityPub processing.
 
 ### Growth Stage
+- Redis queues for background federation tasks (e.g., retrying outbox post deliveries).
+- Caching layer for remote profiles and actors.
+- Node sharding: Universities and companies spin up individual nodes, distributing infrastructure load and server costs.
 
-- Separate backend service
-- Redis cache
-- Search engine
-- Background workers
-- Object storage
-- Observability stack
+### Scale Stage & Sustainability
+- **Federated Moderation**: Sharing instance-level blocklists (similar to Mastodon blocklists) to mitigate MLMs and spammers.
+- **Enterprise APIs**: Paid access hooks to federated nodes for corporate ATS tools, allowing recruiters to pull verified profiles (granting sustainable revenue to the parent foundation).
 
-### Scale Stage
-
-- Microservices only if necessary
-- Recommendation service
-- Vector database
-- Event-driven architecture

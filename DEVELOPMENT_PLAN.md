@@ -51,52 +51,42 @@ Infra:
 
 ## Stage 2: MVP Build
 
-### Sprint 1: Auth and User Model
+### Sprint 1: Auth, Cryptographic Keys, and Schema
+- Auth pages (Signup, Login, Logout)
+- Prisma DB Schema setup (supporting local vs. remote profiles, Instance nodes, and verification states)
+- Session handling and security filters
+- **Cryptographic Key Utility**: Generate unique RSA-256 keypairs on signup (store public key, encrypt and save private key for ActivityPub HTTP signatures)
 
-- Auth pages
-- User schema
-- Session handling
-- Protected routes
+### Sprint 2: Profile & Ingestion Portability
+- Profile schema mapping (experiences, education, skills)
+- Profile create/edit forms
+- **Resume Ingestion Engine**: Service to upload and parse JSON Resume files or LinkedIn zip archives (mapping csv/json to Profile models)
+- Public profile page rendering imported career history
 
-### Sprint 2: Profile System
+### Sprint 3: Feed & Curation Sliders
+- Post schemas (with `local` boolean flag and `apId` ActivityPub URI hooks)
+- Create post UI & API
+- **Transparent Feed Sliders UI**: Feed dashboard sliders allowing users to weigh Recency vs. Verified Domains vs. Skills
+- **Weighted Feed API**: Dynamic PostgreSQL query sorting using slider weights
 
-- Profile schema
-- Profile create/edit UI
-- Public profile page
-- Skill tags
-- Project links
+### Sprint 4: AI & Auto-Tagging Assistant
+- AI resume mapping: Auto-extract skills from imported LinkedIn archives using abstracted AI prompts
+- AI rewrite bio & improve headline
+- AI post tone improvement & project description summaries
+- Safety logs and system prompting protections
 
-### Sprint 3: Feed
+### Sprint 5: Trust Verification & ActivityPub Foundation
+- **Domain Verification Engine**: Email verification codes and DNS TXT record challenge checking
+- Verification badge UI elements
+- **ActivityPub Actor Endpoints**: Build basic Webfinger endpoint (`/.well-known/webfinger`) and Actor profile JSON payload (`/users/[username]`)
+- User search, post search, and verified domain filters
 
-- Post schema
-- Create post
-- Feed page
-- Like/comment basic support
-- Follow system
+### Sprint 6: Polish, Self-Hosting, & Niche Launch
+- UI polish (premium dashboard, glassmorphism, responsive sidebar layout)
+- **Local Self-Hosting Config**: Setup Docker Compose templates for easy self-hosting of independent nodes
+- Seed mock data (populating local DB with mock peer federated users and posts)
+- Production-ready build testing and public GitHub launch
 
-### Sprint 4: AI Assistant
-
-- AI rewrite bio
-- AI improve headline
-- AI improve post
-- AI generate project summary
-- Prompt logging
-
-### Sprint 5: Search and Discovery
-
-- User search
-- Post search
-- Skill filters
-- Basic recommendations
-
-### Sprint 6: Polish and Launch
-
-- Landing page
-- Documentation
-- Seed data
-- Bug fixes
-- Deployment
-- Public GitHub launch
 
 ## Engineering Rules
 

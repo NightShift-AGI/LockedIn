@@ -18,62 +18,58 @@ Responsibilities:
 
 Starter Tasks:
 
-- Create landing page
-- Create auth page UI
-- Create profile card component
-- Create post card component
-- Create navbar/sidebar
+- Create landing page and auth page UI
+- Create drag-and-drop JSON Resume / LinkedIn zip file uploader component
+- Add feed customizer UI sliders (Recency, Verified, and Skills weights)
+- Create verified domain badge component for public profiles
+- Create responsive navigation and feed layouts
 
 ### Backend Intern
 
 Responsibilities:
 
-- Build APIs
-- Work with database models
-- Add validation
-- Write tests
+- Build APIs and controller logic
+- Work with database models and Prisma clients
+- Write parsing and verification routines
+- Write integration tests for API endpoints
 
 Starter Tasks:
 
-- Create user profile API
-- Create post API
-- Create follow API
-- Create search API
-- Add input validation
+- Build LinkedIn archive zip and JSON Resume file parsing handler
+- Build weighted feed sorting API (reading query parameters for sliders)
+- Build DNS TXT record challenge generator and validation API
+- Create local SMTP verification mail router
+- Create Webfinger lookup (`/.well-known/webfinger`) and public Actor JSON endpoints
 
 ### AI Intern
 
 Responsibilities:
 
-- Build prompt templates
-- Add AI feature endpoints
-- Test output quality
-- Improve safety
+- Build prompt templates for profile optimizations
+- Design skill auto-extraction and tags indexing layer
+- Test output formatting and safety filters
 
 Starter Tasks:
 
-- Prompt for headline improvement
-- Prompt for bio rewrite
-- Prompt for post improvement
-- Prompt for project summary
-- Add AI request logging
+- Prompt engineering for auto-extracting skill arrays from raw resume text
+- Prompt for headline improvement suggestions
+- Prompt for bio rewrite suggestions
+- Add logs tracker for AI calls with injection sanitization
 
 ### DevOps/Docs Intern
 
 Responsibilities:
 
 - Maintain documentation
-- Improve setup flow
-- Add GitHub templates
-- Add CI/CD
+- Configure environment containers
+- Set up automated testing pipelines
 
 Starter Tasks:
 
-- Write local setup guide
-- Add issue templates
-- Add PR template
-- Add GitHub Actions
-- Add contribution guide
+- Create Docker Compose configuration for spin-up of local self-hosted instances
+- Write local setup guide detailing custom domain mapping and SMTP setup
+- Add issue templates and PR template files
+- Set up GitHub Actions CI for Lint/Test validation
 
 ## Weekly Workflow
 
@@ -107,13 +103,14 @@ Starter Tasks:
 
 ## First 10 Issues
 
-1. Set up Next.js app
-2. Add Tailwind and shadcn/ui
-3. Create landing page
-4. Create auth UI
-5. Design Prisma schema
-6. Add profile creation page
-7. Add public profile page
-8. Add post creation
-9. Add feed page
-10. Add AI bio rewrite endpoint
+1. Set up Next.js app, Postgres connection, and local Prisma DB structure
+2. Create landing page and Auth UI (Signup/Login/Logout)
+3. Add cryptographic RSA-256 keypair generator upon local signup
+4. Build drag-and-drop JSON Resume & LinkedIn archive uploader UI
+5. Create parser service to ingest uploaded resumes and hydrate profile records
+6. Build public profile page displaying work history, education, and verified badges
+7. Build feed dashboard containing algorithm curating weight sliders
+8. Build backend weighted feed controller supporting Recency, Verified, and Skills weights
+9. Implement DNS TXT validation crawler and SMTP challenge validator
+10. Implement Webfinger (`/.well-known/webfinger`) and Actor JSON response paths
+
