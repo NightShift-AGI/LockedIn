@@ -4,6 +4,8 @@
 
 lockedin is built as a federated professional network where independent instances (nodes) can host their own communities while communicating seamlessly via the **ActivityPub** protocol.
 
+The database and backend-relevant services are built using **Supabase** (incorporating Supabase Auth, Supabase Database, Supabase Storage, and Supabase Edge Functions where possible) as our primary technical stack. When serverless/Edge architectures are insufficient (e.g. for custom cryptographic handshakes, ActivityPub signature matching, and complex dynamic routing), Next.js API Routes and standard Prisma query models are used as the fallback backend layer.
+
 ```text
                [ Peer lockedin Instance ]
                            ^
@@ -18,7 +20,7 @@ lockedin is built as a federated professional network where independent instance
              +---> [ ActivityPub Engine ] (Inbox/Outbox routing & HTTP signatures)
              |
              v
-        [ PostgreSQL + Prisma ]
+  [ Supabase (PostgreSQL, Auth, Storage, Edge Functions) + Prisma ]
 ```
 
 ---
@@ -26,8 +28,9 @@ lockedin is built as a federated professional network where independent instance
 ## 2. Core Modules
 
 ### 2.1 Auth & Key Management Module
-- **Responsibilities**: Local user signup, login, session validation, and JWT management.
+- **Responsibilities**: Local user signup, login, session validation, and JWT management (primary implementation utilizes **Supabase Auth**).
 - **Federation requirement**: Upon registration, generates a unique RSA-256 key pair for the user. The public key is published on the user's actor profile, and the private key is encrypted and stored in the database, used to sign outbound federated messages (HTTP Signatures).
+
 
 ### 2.2 User/Profile & Verification Module
 - **Responsibilities**: Manages local profiles and parses/indexes profiles from other instances.
@@ -200,9 +203,10 @@ model FeedPreference {
 ## 5. Scalability & Sustainability Plan
 
 ### MVP
-- Single-instance Next.js monolithic deployment.
-- Local SQLite or Postgres database.
-- Synchronous ActivityPub processing.
+- Single-instance Next.js deployment.
+- Database, authentication, and file storage hosted on **Supabase** (utilizing PostgreSQL, Supabase Auth, and Supabase Storage).
+- Synchronous ActivityPub processing fallback via Next.js API routes where edge/serverless contexts are not suitable.
+
 
 ### Growth Stage
 - Redis queues for background federation tasks (e.g., retrying outbox post deliveries).

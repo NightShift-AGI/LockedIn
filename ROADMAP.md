@@ -27,12 +27,13 @@ Deliverables:
 Timeline: Week 1 to Week 3
 
 Goals:
-- Set up core Next.js, Postgres database (Prisma), and Tailwind UI stack
-- Build local authentication and session validation
+- Set up core Next.js, Supabase stack (PostgreSQL, Auth, Storage), and Tailwind UI
+- Configure database schemas using Prisma and set up Supabase Auth authentication flow
 - Generate and store user-profile cryptographic RSA public/private keypairs
 
 Deliverables:
-- Working local server with auth and database schema
+- Working local server integrated with Supabase auth and database schema
+
 - Secure encrypted private key storage utility
 - Basic routing framework
 

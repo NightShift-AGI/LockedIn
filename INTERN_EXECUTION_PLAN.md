@@ -103,8 +103,8 @@ Starter Tasks:
 
 ## First 10 Issues
 
-1. Set up Next.js app, Postgres connection, and local Prisma DB structure
-2. Create landing page and Auth UI (Signup/Login/Logout)
+1. Set up Next.js app, Supabase integration (Auth, Database, Storage), and local Prisma DB structure
+2. Create landing page and Auth UI (Signup/Login/Logout via Supabase Auth)
 3. Add cryptographic RSA-256 keypair generator upon local signup
 4. Build drag-and-drop JSON Resume & LinkedIn archive uploader UI
 5. Create parser service to ingest uploaded resumes and hydrate profile records
@@ -113,4 +113,5 @@ Starter Tasks:
 8. Build backend weighted feed controller supporting Recency, Verified, and Skills weights
 9. Implement DNS TXT validation crawler and SMTP challenge validator
 10. Implement Webfinger (`/.well-known/webfinger`) and Actor JSON response paths
+
 

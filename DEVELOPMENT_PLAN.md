@@ -21,33 +21,31 @@ Goal: Set up the team, repository, planning documents, and engineering workflow.
 ### Recommended Stack
 
 Frontend:
-
 - Next.js
 - TypeScript
 - Tailwind CSS
 - shadcn/ui
 
-Backend:
-
-- Next.js API routes or NestJS
-- PostgreSQL
-- Prisma ORM
-- Redis later for caching/jobs
+Backend & Database (Primary: Supabase):
+- **Supabase Database**: Managed PostgreSQL database instance
+- **Supabase Auth**: JWT-based session and user access control
+- **Supabase Storage**: Object storage for user profiles, avatars, and uploaded resumes
+- **Supabase Edge Functions / Next.js API Routes**: Serverless execution of API logic, fallback to Next.js API routes when Supabase serverless functions are not suitable (e.g., complex custom ActivityPub protocol routines)
+- **Prisma ORM**: Used for database schema synchronization and custom backend queries
+- **Redis**: For task queues/caching where necessary
 
 AI:
-
 - OpenAI-compatible API abstraction
 - Prompt templates
 - AI usage logging
 - Safety filters
 
 Infra:
-
-- Docker
+- Supabase Platform (Production hosted services)
+- Docker (for local self-hosting, bundling the local Supabase stack or a standard PostgreSQL setup)
+- Vercel for Frontend and custom route logic
 - GitHub Actions
-- Vercel for frontend
-- Supabase/Neon for PostgreSQL
-- S3-compatible storage later
+
 
 ## Stage 2: MVP Build
 
