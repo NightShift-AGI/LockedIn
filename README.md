@@ -17,11 +17,11 @@ Zero stage: idea validation, product planning, architecture planning, team align
 
 ## Core Documents
 
-1. [PRD](./PRD.md)
-2. [Development Plan](./DEVELOPMENT_PLAN.md)
-3. [Architecture](./ARCHITECTURE.md)
-4. [Roadmap](./ROADMAP.md)
-5. [Intern Execution Plan](./INTERN_EXECUTION_PLAN.md)
+1. [PRD](./documentations/PRD.md)
+2. [Development Plan](./documentations/DEVELOPMENT_PLAN.md)
+3. [Architecture](./documentations/ARCHITECTURE.md)
+4. [Roadmap](./documentations/ROADMAP.md)
+5. [Intern Execution Plan](./documentations/INTERN_EXECUTION_PLAN.md)
 
 ## Suggested MVP Goal
 
