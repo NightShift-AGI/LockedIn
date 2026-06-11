@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Recommended for Supabase transaction pooling
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  username     String    @unique
+  publicKey    String    // For ActivityPub HTTP Signatures
+  privateKey   String    // Encrypted RSA private key
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  profile      Profile?
+  posts        Post[]
+  comments     Comment[]
+  likes        Like[]
+}
+
+model Instance {
+  id          String    @id @default(uuid())
+  domain      String    @unique // e.g. "lockedin.university.edu"
+  sharedInbox String
+  status      String    // "ACTIVE", "BLOCKED"
+  createdAt   DateTime  @default(now())
+  profiles    Profile[]
+}
+
+model Profile {
+  id             String         @id @default(uuid())
+  userId         String?        @unique
+  user           User?          @relation(fields: [userId], references: [id])
+  instanceId     String?        // Null for local users
+  instance       Instance?      @relation(fields: [instanceId], references: [id])
+  apActorUri     String?        @unique // URI for remote actors
+  headline       String?
+  bio            String?
+  location       String?
+  website        String?
+  githubUrl      String?
+  jsonResumeData Json?          // Store raw imported data
+  experiences    Experience[]
+  skills         UserSkill[]
+  verifications  Verification[]
+}
+
+model Verification {
+  id          String    @id @default(uuid())
+  profileId   String
+  profile     Profile   @relation(fields: [profileId], references: [id])
+  domain      String    // Verified organization domain (e.g. "google.com")
+  verifiedAt  DateTime  @default(now())
+  method      String    // "DNS_TXT" or "EMAIL_CONFIRM"
+}
+
+model Skill {
+  id        String      @id @default(uuid())
+  name      String      @unique
+  profiles  UserSkill[]
+}
+
+model UserSkill {
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id])
+  skillId   String
+  skill     Skill   @relation(fields: [skillId], references: [id])
+  @@id([profileId, skillId])
+}
+
+model Experience {
+  id          String    @id @default(uuid())
+  profileId   String
+  profile     Profile   @relation(fields: [profileId], references: [id])
+  company     String
+  role        String
+  startDate   DateTime
+  endDate     DateTime?
+  description String?
+}
+
+model Post {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  apId      String    @unique // ActivityPub unique URI for the post
+  content   String
+  local     Boolean   @default(true) // False if fetched from remote instance
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  comments  Comment[]
+  likes     Like[]
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerUri String   // URI of the follower (supports remote actor URIs)
+  followingUri String  // URI of the followed actor
+  status      String   // "PENDING", "ACCEPTED"
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Like {
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  postId String
+  post   Post   @relation(fields: [postId], references: [id])
+  @@id([userId, postId])
+}
+
+model FeedPreference {
+  id             String @id @default(uuid())
+  userId         String @unique
+  recencyWeight  Float  @default(0.5)
+  verifiedWeight Float  @default(0.3)
+  skillWeight    Float  @default(0.2)
+}
+
